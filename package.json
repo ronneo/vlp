@@ -1,0 +1,59 @@
+{
+  "name": "video-vlp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@blueprintjs/core": "^3.28.1",
+    "@blueprintjs/select": "^3.13.2",
+    "amazon-chime-sdk-js": "^1.8.0",
+    "aws-sdk": "^2.691.0",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "face-api.js": "^0.22.2",
+    "helmet": "^3.22.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^24.9.1",
+    "@types/node": "^12.12.44",
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
+    "concurrently": "^5.2.0",
+    "cross-env": "^7.0.2",
+    "nodemon": "^2.0.4",
+    "react-scripts": "3.4.1",
+    "typescript": "^3.9.5"
+  },
+  "scripts": {
+    "start-front": "HTTPS=true react-scripts start",
+    "build-front": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "start-server": "cross-env NODE_ENV=development nodemon server/index.js --watch server/index.js --watch server/routes",
+    "start": "concurrently \"npm run start-server\" \"npm run start-front\" --kill-others"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "proxy": "http://localhost:4000",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

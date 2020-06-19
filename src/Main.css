@@ -1,0 +1,99 @@
+.Main-div {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.setupchat {
+    text-align: center;
+    max-width: 600px;
+    margin:0 auto;
+}
+
+.chatsetting {
+    margin:0 0 20px 0;
+}
+
+.chatsettingrow {
+    margin:0 0 15px 0;
+    text-align: left;
+}
+
+.chatsettingrow button {
+    outline:none;
+}
+
+.chatsettingrow > span {
+    display:inline-block;
+    width:12em;
+}
+
+.launchpad {
+    width:100%;
+}
+
+.videochatWrapper {
+    min-height: 100vh;
+}
+
+.videochat {
+    display:flex;
+    flex-direction:row;
+    height:100vh
+}
+
+.deviceselector {
+    max-width: 600px;
+    margin:0 auto;
+}
+
+.remoteVideo {
+    width:100%;
+    height:50%;
+}
+
+.localVideo {
+    width:100%;
+    height:50%;
+}
+
+.transcript {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 20em;
+}
+
+.videocont {
+    flex-grow: 1;
+}
+
+.videochatController {
+    text-align: right;
+    bottom:0;
+    position: absolute;
+    width:100%
+}
+
+.leavebutton {
+    width:20em;
+}
+
+.startchat {
+    text-align: center;
+    padding:10px 0 0 0;
+}
+
+.videofeedback {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.staricon {
+    margin:4px 2px 20px 2px;
+    cursor: pointer;
+}
