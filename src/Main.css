@@ -14,24 +14,6 @@
     margin:0 auto;
 }
 
-.chatsetting {
-    margin:0 0 20px 0;
-}
-
-.chatsettingrow {
-    margin:0 0 15px 0;
-    text-align: left;
-}
-
-.chatsettingrow button {
-    outline:none;
-}
-
-.chatsettingrow > span {
-    display:inline-block;
-    width:12em;
-}
-
 .launchpad {
     width:100%;
 }
@@ -96,4 +78,8 @@
 .staricon {
     margin:4px 2px 20px 2px;
     cursor: pointer;
+}
+
+select, input {
+    outline:0 !important;
 }

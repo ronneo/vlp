@@ -40,7 +40,7 @@ const LaunchPad = () => {
 			body: JSON.stringify({ settings:userAttributes })
 		};
 		
-		fetch('/users/launch/testmeeting7', requestOptions)
+		fetch('/users/launch/', requestOptions)
 		.then(response => response.json())
 		.then(data => {
 			attendee = data.attendeeInfo

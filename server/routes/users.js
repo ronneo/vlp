@@ -11,19 +11,21 @@ chime.endpoint = new AWS.Endpoint(process.env.ENDPOINT || 'https://service.chime
 router.post('/launch/:meeting?', async (req, res) => {
 	let reqMeeting = req.params.meeting
 	console.log('received meeting key: '+reqMeeting);
+
 	if (!meetingTable[reqMeeting]) {
 		meetingTable[reqMeeting] = {}
 
-		meetingTable[reqMeeting].meeting = await chime.createMeeting({
-			// Use a UUID for the client request token to ensure that any request retries
-			// do not create multiple meetings.
-			ClientRequestToken: uuid(),
-			// Specify the media region (where the meeting is hosted).
-			// https://docs.aws.amazon.com/general/latest/gr/rande.html
-			MediaRegion: "us-east-1",
-			// Any meeting ID you wish to associate with the meeting.
-			ExternalMeetingId: reqMeeting.substring(0, 64),
-		}).promise();
+		try {
+			meetingTable[reqMeeting].meeting = await chime.createMeeting({
+				ClientRequestToken: uuid(),
+				// https://docs.aws.amazon.com/general/latest/gr/rande.html
+				MediaRegion: "us-east-1",
+				ExternalMeetingId: reqMeeting.substring(0, 64),
+			}).promise();
+		} catch (error) {
+			//cannot create meeting for some reason
+		}
+
 		console.log('Creating new Meeting')
 	}
 
