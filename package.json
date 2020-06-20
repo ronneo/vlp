@@ -38,7 +38,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start-server": "cross-env NODE_ENV=development nodemon server/index.js --watch server/index.js --watch server/routes",
-    "start": "concurrently \"npm run start-server\" \"npm run start-front\" --kill-others"
+    "start": "concurrently \"npm run start-server\" \"npm run start-front\" --kill-others",
+    "start-production": "NODE_ENV=production node server/index.js"
   },
   "eslintConfig": {
     "extends": "react-app"

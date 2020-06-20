@@ -10,7 +10,7 @@ import { FaceDetection, FaceExpressions } from 'face-api.js';
 type Props = {
     meetingSession: DefaultMeetingSession,
     leave: () => void,
-    setFeedback: ({}) => void
+    setFeedback: (x:any) => void
 }
 
 const VideoChat = (props:Props) => {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, InputGroup, ButtonGroup, Button } from "@blueprintjs/core";
 
 type Props = {
-    updateAttribute:({}:any) => void
+    updateAttribute:(x: any) => void
 }
 
 const ChatSettings = (props:Props) => {
@@ -18,6 +18,7 @@ const ChatSettings = (props:Props) => {
             'language': language,
             'chatLeve': chatLevel
         })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [displayName])
 
     return (<Card className="chatsetting">

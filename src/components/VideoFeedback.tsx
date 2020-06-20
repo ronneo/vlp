@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';    
-import { Card, InputGroup, ButtonGroup, Icon, Button } from "@blueprintjs/core";
+import React, { useState } from 'react';    
+import { Card, ButtonGroup, Icon, Button } from "@blueprintjs/core";
 
 type Props = {
     feedback:any,
