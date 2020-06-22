@@ -4,6 +4,7 @@ import * as faceapi from 'face-api.js'
 import { VideoToaster } from './VideoToaster'
 import {
     DefaultMeetingSession,
+    MeetingSessionStatusCode
 } from 'amazon-chime-sdk-js';
 import { FaceDetection, FaceExpressions } from 'face-api.js';
 
@@ -30,8 +31,6 @@ const VideoChat = (props:Props) => {
 
     Promise.all([
         faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-        //faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-        //faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
         faceapi.nets.faceExpressionNet.loadFromUri('/models')
     ]).then(() => {
         modelsLoaded = true
@@ -41,11 +40,15 @@ const VideoChat = (props:Props) => {
         audioVideoDidStart: () => {
         },
         audioVideoDidStop: (sessionStatus:any) => {
+            const sessionStatusCode = sessionStatus.statusCode();
+            if (sessionStatusCode === MeetingSessionStatusCode.AudioCallEnded) {
+                leaveChat()
+            }
         },
         audioVideoDidStartConnecting: (reconnecting:any) => {
         },
         videoTileDidUpdate: (tileState:any) => {
-            console.log('attendeeId: '+tileState.boundAttendeeId)
+            console.log('attendeeId: ', tileState)
             if (tileState.localTile) {
                 props.meetingSession.audioVideo.bindVideoElement(tileState.tileId, localVideoRef.current);
             }
@@ -71,7 +74,7 @@ const VideoChat = (props:Props) => {
         props.meetingSession.audioVideo.bindAudioElement(audioRef.current);
 
         props.meetingSession.audioVideo.addObserver(AVobserver);
-        props.meetingSession.audioVideo.realtimeMuteLocalAudio();
+        //props.meetingSession.audioVideo.realtimeMuteLocalAudio();
         props.meetingSession.audioVideo.start();
         props.meetingSession.audioVideo.startLocalVideoTile();
         // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -98,10 +98,11 @@ const ChatSettings = (props:Props) => {
             'displayName': displayName,
             'chatType': chatType,
             'language': language,
-            'chatLevel': chatLevel
+            'chatLevel': chatLevel,
+            'speak': speaker
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [displayName, chatType, language, chatLevel])
+    }, [displayName, chatType, language, chatLevel, speaker])
 
     return (<Card style={styleChatSetting}>
         <div style={styleChatRow}>

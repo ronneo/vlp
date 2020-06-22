@@ -83,3 +83,7 @@
 select, input {
     outline:0 !important;
 }
+
+video {
+    object-fit: cover;
+}
