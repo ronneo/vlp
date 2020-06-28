@@ -101,9 +101,6 @@ const LaunchPad = () => {
 		}
 		updateAudioVideo()
 	}, [videoInputDevice, meetingSession])
-	useEffect(() => {
-		console.log('Receive feedback: ', feedback)
-	}, [feedback])
 
 	const renderStage = () => {
 		switch(stage) {

@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const AWS = require('aws-sdk')
 const uuid = require('uuid/v4')
-const matchMeetings = require('../components/matchMeeting')
+const { matchMeetings, removeMeeting } = require('../components/meetingUtils')
 
 const meetingTable = []
 AWS.config.loadFromPath('./aws.json')
@@ -17,19 +17,15 @@ router.post('/launch/:meeting?', async (req, res) => {
 
 	let acceptedMeeting = null
 	let username = req.body.settings.displayName
-
 	if (username === '') {
 		username = 'user_'+uuid().substring(0, 8)
 	}
 
-	console.log('user logging in', req.body.settings)
-	const matchedMeeting = matchMeetings(meetingTable, req.body.settings)
-
-	if (matchedMeeting === null) {
-		acceptedMeeting = {}
-
+	const createMeeting = async () => {
+		console.log('Creating new Meeting')
+		const newMeeting = {}
 		try {
-			acceptedMeeting.meeting = await chime.createMeeting({
+			newMeeting.meeting = await chime.createMeeting({
 				ClientRequestToken: uuid(),
 				// https://docs.aws.amazon.com/general/latest/gr/rande.html
 				MediaRegion: "us-east-1",
@@ -38,28 +34,48 @@ router.post('/launch/:meeting?', async (req, res) => {
 		} catch (error) {
 			//cannot create meeting for some reason
 			console.log('Create meeting error', error)
+			return null
 		}
-		acceptedMeeting.attendees = []
-		meetingTable.push(acceptedMeeting)
-		console.log('Creating new Meeting')
+		newMeeting.attendees = []
+		meetingTable.push(newMeeting)
+		return newMeeting
+	}
+
+	const newAttendee = async (attendeeName) => {
+		const attendee = await chime.createAttendee({
+			// The meeting ID of the created meeting to add the attendee to
+			MeetingId: acceptedMeeting.meeting.Meeting.MeetingId,
+
+			// Any user ID you wish to associate with the attendeee.
+			ExternalUserId: `${uuid().substring(0, 8)}#${attendeeName}`.substring(0, 64),
+			Tags: [
+				{Key:'name', Value:attendeeName}
+			]
+		}).promise()
+		return attendee
+	}
+	const matchedMeeting = matchMeetings(meetingTable, req.body.settings)
+
+	if (matchedMeeting === null) {
+		acceptedMeeting = await createMeeting()
 	} else {
 		acceptedMeeting = matchedMeeting
 	}
 
-	console.log(acceptedMeeting)
-	const attendee = await chime.createAttendee({
-		// The meeting ID of the created meeting to add the attendee to
-		MeetingId: acceptedMeeting.meeting.Meeting.MeetingId,
+	try {
 
-		// Any user ID you wish to associate with the attendeee.
-		ExternalUserId: `${uuid().substring(0, 8)}#${username}`.substring(0, 64),
-		Tags: [
-			{Key:'name', Value:username}
-		]
-	}).promise()
-	acceptedMeeting.attendees.push(attendee)
-
-	res.json({meetingInfo:acceptedMeeting.meeting, attendeeInfo:attendee})
+		const attendee = await newAttendee(username)
+		acceptedMeeting.attendees.push(attendee)
+		res.json({meetingInfo:acceptedMeeting.meeting, attendeeInfo:attendee})
+	} catch (error) {
+		console.log('Create meeting error', error)
+		//meeting ended, delete it
+		removeMeeting(meetingTable, acceptedMeeting.meeting.Meeting.MeetingId)
+		acceptedMeeting = await createMeeting()
+		const attendee = await newAttendee(username)
+		acceptedMeeting.attendees.push(attendee)
+		res.json({meetingInfo:acceptedMeeting.meeting, attendeeInfo:attendee})
+	}
 })
 
 router.post('/feedback/', (req, res) => {
