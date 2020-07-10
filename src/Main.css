@@ -23,35 +23,12 @@
 }
 
 .videochat {
-    display:flex;
-    flex-direction:row;
     height:100vh
 }
 
 .deviceselector {
     max-width: 600px;
     margin:0 auto;
-}
-
-.remoteVideo {
-    width:100%;
-    height:50%;
-}
-
-.localVideo {
-    width:100%;
-    height:50%;
-}
-
-.videochatController {
-    text-align: right;
-    bottom:0;
-    position: absolute;
-    width:100%
-}
-
-.leavebutton {
-    width:20em;
 }
 
 .startchat {

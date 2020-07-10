@@ -1,15 +1,16 @@
-import React, { useEffect, useRef } from 'react';    
-import { Card, Button, Intent } from "@blueprintjs/core";
+import React, { useEffect, useRef, useState } from 'react';    
+import { Button, Intent } from "@blueprintjs/core";
 import * as faceapi from 'face-api.js'
 import { VideoToaster } from './VideoToaster'
 import VideoPrompter from './VideoPrompter'
 import {
     DefaultMeetingSession,
     MeetingSessionStatusCode
-} from 'amazon-chime-sdk-js';
+} from 'amazon-chime-sdk-js'
 
 type Props = {
     meetingSession: DefaultMeetingSession,
+    meetingActivity: Array<any>,
     leave: () => void,
     setFeedback: (x:any) => void
 }
@@ -17,22 +18,39 @@ type Props = {
 const VideoChat = (props:Props) => {
 
     const styleTranscript = {
-        flexGrow: 0,
-        flexShrink: 0,
-        flexBasis: '20em'
+        position: 'absolute' as 'absolute',
+        bottom: '1em',
+        left:'50%',
+        margin: '0 0 0 -200px',
+        width:'400px'
     }
     const styleCanvas = {
-        width:'100%',
-        height:'50%',
+        width:'50%',
+        height:'100%',
         position:'absolute' as 'absolute',
-        top:'50%',
+        top:0,
         left:0,
     }
     const styleVideoCont = {
-        flexGrow: 1,
-        position: 'relative' as 'relative'
+        width:'100%',
+        height:'100%'
+    }
+    const syleRemoteVideo = {
+        width:'50%',
+        height:'100%'
+    }
+    const styleLocalVideo = {
+        width:'50%',
+        height:'100%'
+    }
+    const styleLeaveBtn = {
+        position:'absolute' as 'absolute',
+        top: '1em',
+        right: '1em'
     }
 
+    const [sessionEnd, setSessionEnd] = useState(false)
+    const [startVideo, setStartVideo] = useState(false)
     const audioRef:any = useRef(null)
     const localVideoRef:any = useRef(null)
     const remoteVideoRef:any = useRef(null)
@@ -45,6 +63,7 @@ const VideoChat = (props:Props) => {
         positive:0,
         negative:0,
         happy:0,
+        trackAlert:0,
     }
 
     Promise.all([
@@ -57,6 +76,7 @@ const VideoChat = (props:Props) => {
 
     const AVobserver = {
         audioVideoDidStart: () => {
+            setStartVideo(true)
         },
         audioVideoDidStop: (sessionStatus:any) => {
             const sessionStatusCode = sessionStatus.statusCode();
@@ -67,7 +87,8 @@ const VideoChat = (props:Props) => {
         audioVideoDidStartConnecting: (reconnecting:any) => {
         },
         videoTileDidUpdate: (tileState:any) => {
-            console.log('attendeeId: ', tileState)
+            if (localVideoRef.current === null) return
+
             if (tileState.localTile) {
                 props.meetingSession.audioVideo.bindVideoElement(tileState.tileId, localVideoRef.current);
             }
@@ -86,10 +107,12 @@ const VideoChat = (props:Props) => {
         props.setFeedback({
             videoResults: faceTrackingResults
         })
+        setSessionEnd(true)
         props.leave()
     }
 
     useEffect(() => {
+        if (props.meetingSession === null) return
         props.meetingSession.audioVideo.bindAudioElement(audioRef.current);
 
         props.meetingSession.audioVideo.addObserver(AVobserver);
@@ -100,36 +123,44 @@ const VideoChat = (props:Props) => {
     }, [props.meetingSession])
 
     const initFaceRecongition = () => {
-        const canvasSize = new faceapi.Dimensions(
-            localVideoRef.current.clientWidth, 
-            localVideoRef.current.clientHeight
-        )
-        
-        console.log('facesize', canvasSize)
-        faceapi.matchDimensions(videoCanvas.current, canvasSize)
         faceTrackingInt = window.setInterval(async () => {
             if (!modelsLoaded) return
-            
+            const canvasSize = new faceapi.Dimensions(
+                localVideoRef.current.clientWidth, 
+                localVideoRef.current.clientHeight
+            )
+            faceapi.matchDimensions(videoCanvas.current, canvasSize)
+
             const faceInfo = await faceapi.detectSingleFace(localVideoRef.current,
                 new faceapi.TinyFaceDetectorOptions()).withFaceExpressions()
-            
-            displayDetection(faceInfo, canvasSize)
+            //const ctx = videoCanvas.current.getContext('2d')
+            //videoCanvas.current.getContext('2d').clearRect(0,0,videoCanvas.current.clientWidth, videoCanvas.current.clientHeight)    
+            //ctx.strokeRect(100, 100, 200,200)   
+    
+            displayDetection(faceInfo)
             interpretDetections(faceInfo)
         }, 200)
     }
     
-    const displayDetection = (faceInfo:any | undefined, canvasSize:faceapi.Dimensions) => {
+    const displayDetection = (faceInfo:any | undefined) => {
         if (videoCanvas.current === null) return
-        videoCanvas.current.getContext('2d').clearRect(0,0,
-            videoCanvas.current.clientWidth, videoCanvas.current.clientHeight)
 
         if (faceInfo === undefined) {
             return
         }
+        videoCanvas.current.getContext('2d').clearRect(0,0,
+            videoCanvas.current.clientWidth, videoCanvas.current.clientHeight)
+            
+        const scaleRatio = localVideoRef.current.clientWidth/faceInfo.detection.imageWidth > localVideoRef.current.clientHeight/faceInfo.detection.imageHeight?
+        localVideoRef.current.clientWidth/faceInfo.detection.imageWidth : localVideoRef.current.clientHeight/faceInfo.detection.imageHeight
+        const canvasSize = new faceapi.Dimensions(
+            faceInfo.detection.imageWidth*scaleRatio, 
+            faceInfo.detection.imageHeight*scaleRatio
+        )
+
         const detectionSize = faceapi.resizeResults(faceInfo, canvasSize)
         const expression = faceInfo.expressions
         //3 feelings red = bad, green=happy, blue=netrual
-
         
         if (detectionSize !== undefined) {
             const box = detectionSize.detection.box
@@ -162,18 +193,24 @@ const VideoChat = (props:Props) => {
                 ctx.strokeStyle = 'rgb(0,'+(rgbValue[1]*255)+',0)'
             }
             ctx.lineWidth = 2;
-            //flip the box
-            ctx.strokeRect(canvasSize.width - (box.left + box.width), box.top, box.width, box.height)
             ctx.font = "18px Georgia";
             ctx.fillStyle = 'white';
-            ctx.fillText(maxExpression, canvasSize.width - (box.left + box.width)+4, box.top+16);
+
+            if (localVideoRef.current.clientWidth/faceInfo.detection.imageWidth < localVideoRef.current.clientHeight/faceInfo.detection.imageHeight) {
+                let offset = (faceInfo.detection.imageWidth*scaleRatio - localVideoRef.current.clientWidth)/2
+                ctx.strokeRect(canvasSize.width - (box.left + box.width) - offset, box.top, box.width, box.height)
+                ctx.fillText(maxExpression, canvasSize.width - (box.left + box.width)+4 - offset, box.top+16);
+            } else {
+                let offset = (faceInfo.detection.imageHeight*scaleRatio - localVideoRef.current.clientHeight)/2
+                ctx.strokeRect(canvasSize.width - (box.left + box.width), box.top - offset, box.width, box.height)
+                ctx.fillText(maxExpression, canvasSize.width - (box.left + box.width)+4, box.top+16 - offset);
+            }          
         }
     }
     
     const interpretDetections = (faceInfo:any | undefined) => {
         if (faceInfo === undefined) {
             //no face detected
-            console.log('no face located')
             return;
         }
         const expression = faceInfo.expressions
@@ -181,18 +218,18 @@ const VideoChat = (props:Props) => {
         //Logic for evaluating a good sessions
         faceTrackingResults.count++
         if (expression.angry > 0.5 || expression.disgusted > 0.5 || expression.fearful > 0.5) {
-            console.log('Logging negative', faceInfo.expressions)
             //negative experience
             faceTrackingResults.negative++
-            if (faceTrackingResults.negative > 10 && !setToaster) {
+            faceTrackingResults.trackAlert++
+            if (faceTrackingResults.trackAlert > 10 && !setToaster) {
                 setToaster = true
+                faceTrackingResults.trackAlert = 0
                 window.setTimeout(() => {
                     setToaster = false
                 }, 5000)
                 VideoToaster.show({ intent: Intent.DANGER, message: 'It seems like you are experiencing a difficult situation. Feel free to disconnect from this call and feedback accordingly'})
             }
         } else if (expression.happy > 0.5) {
-            //console.log('Logging happy', faceInfo.expressions)
             //positive experience
             faceTrackingResults.positive++
             faceTrackingResults.happy += expression.happy
@@ -203,18 +240,15 @@ const VideoChat = (props:Props) => {
         <div className="videochat">
             <audio ref={audioRef}></audio>
             <div style={styleVideoCont}>
-                <video className="remoteVideo" ref={remoteVideoRef}></video>
-                <video onPlay={initFaceRecongition} className="localVideo" ref={localVideoRef}></video>
+                <video onPlay={initFaceRecongition} style={styleLocalVideo} ref={localVideoRef}></video>
+                <video style={syleRemoteVideo} ref={remoteVideoRef}></video>
                 <canvas style={styleCanvas} ref={videoCanvas}></canvas>
             </div>
-            <Card style={styleTranscript}>
-                <VideoPrompter next={true} />
-            </Card>
-            
+            <div style={styleTranscript}>
+                {startVideo?<VideoPrompter ended={sessionEnd} meetingActivity={props.meetingActivity} />:null}
+            </div>
         </div>
-        <div className="videochatController">
-            <Button className="leavebutton" icon="stop" intent="warning" onClick={leaveChat} text="Leave Chat" />
-        </div>        
+        <Button style={styleLeaveBtn} rightIcon="cross" intent="warning" onClick={leaveChat} text="Leave Chat" />       
     </div>)
 }
 

@@ -26,8 +26,9 @@ const LaunchPad = () => {
 	const [userAttributes, setUserAttributes] = useState({})
 	const [feedback, setFeedback] = useState({})
 	const [loading, setLoading] = useState(false)
+	const [activity, setActvity] = useState([])
 
-	const logger = new ConsoleLogger('Device logger', LogLevel.INFO);
+	const logger = new ConsoleLogger('Device logger', LogLevel.ERROR);
 	const deviceController = new DefaultDeviceController(logger);
 
 	const launchMeetingSetup = () => {
@@ -45,6 +46,7 @@ const LaunchPad = () => {
 		.then(data => {
 			attendee = data.attendeeInfo
 			meeting = data.meetingInfo
+			setActvity(data.meetingActivity)
 			setLoading(false);
 
 			const configuration = new MeetingSessionConfiguration(meeting, attendee)
@@ -101,6 +103,9 @@ const LaunchPad = () => {
 		}
 		updateAudioVideo()
 	}, [videoInputDevice, meetingSession])
+	useEffect(() => {
+		console.log('change stage: ', stage)
+	}, [stage])
 
 	const renderStage = () => {
 		switch(stage) {
@@ -122,7 +127,7 @@ const LaunchPad = () => {
 			</div>)
 			case 2: 
 				if (meetingSession === undefined) return <div />
-				return <VideoChat leave={leaveMeeting} meetingSession={meetingSession} setFeedback={setFeedback} />
+				return <VideoChat leave={leaveMeeting} meetingActivity={activity} meetingSession={meetingSession} setFeedback={setFeedback} />
 			case 3:
 				return <VideoFeedback onSubmit={sendFeedback} attendee={attendee} feedback={feedback} />
 		}

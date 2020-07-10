@@ -39,7 +39,7 @@ const VideoFeedback = (props:Props) => {
             <h3>How do you find this chat?</h3>
             <ButtonGroup>
                 {[1,2,3,4,5].map((index)=>{
-                    return <Icon className="staricon" iconSize={Icon.SIZE_LARGE} icon={userRating >= index?'star':'star-empty'} onClick={()=>setUserRating(index)} />
+                    return <Icon key={index} className="staricon" iconSize={Icon.SIZE_LARGE} icon={userRating >= index?'star':'star-empty'} onClick={()=>setUserRating(index)} />
                 })}
             </ButtonGroup>
         </div>

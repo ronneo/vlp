@@ -3,6 +3,7 @@ const router = express.Router()
 const AWS = require('aws-sdk')
 const uuid = require('uuid/v4')
 const { matchMeetings, removeMeeting } = require('../components/meetingUtils')
+const { createActivity } = require('../components/activityUtils')
 
 const meetingTable = []
 AWS.config.loadFromPath('./aws.json')
@@ -62,20 +63,27 @@ router.post('/launch/:meeting?', async (req, res) => {
 		acceptedMeeting = matchedMeeting
 	}
 
+	let attendee = null
 	try {
-
-		const attendee = await newAttendee(username)
-		acceptedMeeting.attendees.push(attendee)
-		res.json({meetingInfo:acceptedMeeting.meeting, attendeeInfo:attendee})
+		attendee = await newAttendee(username)
 	} catch (error) {
 		console.log('Create meeting error', error)
 		//meeting ended, delete it
 		removeMeeting(meetingTable, acceptedMeeting.meeting.Meeting.MeetingId)
 		acceptedMeeting = await createMeeting()
-		const attendee = await newAttendee(username)
-		acceptedMeeting.attendees.push(attendee)
-		res.json({meetingInfo:acceptedMeeting.meeting, attendeeInfo:attendee})
+		attendee = await newAttendee(username)
 	}
+
+	//generate care package
+	const activities = createActivity(req.body.settings)
+
+	acceptedMeeting.attendees.push(attendee)
+	res.json({
+		meetingInfo:acceptedMeeting.meeting, 
+		attendeeInfo:attendee, 
+		meetingAttendee:acceptedMeeting.attendees,
+		meetingActivity: activities
+	})
 })
 
 router.post('/feedback/', (req, res) => {
