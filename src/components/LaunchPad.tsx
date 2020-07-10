@@ -31,6 +31,17 @@ const LaunchPad = () => {
 	const logger = new ConsoleLogger('Device logger', LogLevel.ERROR);
 	const deviceController = new DefaultDeviceController(logger);
 
+	const styleHeader = {
+		margin:'20px 0 40px 0',
+		textAlign:'center' as 'center',
+		fontSize:'1.4em'
+	}
+	const styleLogo = {
+		fontWeight:600,
+		color:'lightskyblue',
+		fontSize:'1.8em'
+	}
+
 	const launchMeetingSetup = () => {
 		if (loading) return
 
@@ -110,6 +121,7 @@ const LaunchPad = () => {
 	const renderStage = () => {
 		switch(stage) {
 			case 0: return (<div className="setupchat">
+				<div style={styleHeader}><span style={styleLogo}>HAIL</span> is here to help you learn new languages<br /> and understand different culture</div>
 				<ChatSetting updateAttribute={setUserAttributes} />
 				<Button icon="play" onClick={launchMeetingSetup} loading={loading} intent="primary" text="Set up new Chat" />
 				</div>)

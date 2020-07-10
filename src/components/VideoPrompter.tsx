@@ -22,8 +22,7 @@ const VideoPrompter = (props:Props) => {
     const styleMessageTranslate = {
     }
     const styleAnswer = {
-        margin:'10px -20px',
-
+        margin:'10px -20px 0 -20px',
     }
     const styleAnswerToken = {
         borderRadius: 10,
@@ -34,6 +33,10 @@ const VideoPrompter = (props:Props) => {
     }
     const styleRefresh = {
         margin:'0 20px'
+    }
+    const styledescriptor = {
+        margin:'0 20px 10px 20px',
+        color:'#999'
     }
     const startSpeechtoText = () => {
         if (speechAPI !== null) return
@@ -84,12 +87,13 @@ const VideoPrompter = (props:Props) => {
     const dialog = props.meetingActivity[activityCount]
 
     return (<div>
-        <div>{(activityCount < props.meetingActivity.length-1)?<Button style={styleRefresh} minimal={true} icon="refresh" text="Next Activity" onClick={nextActivity} />:null}</div>
+        <div>{(activityCount < props.meetingActivity.length-1)?<Button style={styleRefresh} minimal={true} icon="refresh" text="Next Suggestion" onClick={nextActivity} />:null}</div>
         <div style={styleMessageBox}>
             <div style={styleMessageQuestion}>{dialog.question}</div>
             <div style={styleMessageTranslate}>{dialog.question_translated}</div>
-            <div style={styleAnswer}>{
-                dialog.avoid.map((word:string, index:number) => {
+            <div style={styleAnswer}>
+                <div style={styledescriptor}>Try to use these words:</div>
+                {dialog.avoid.map((word:string, index:number) => {
                     let wstyle = {...styleAnswerToken}
                     if (selectedWord[index]) {
                         wstyle.background = '#990000'

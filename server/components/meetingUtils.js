@@ -4,7 +4,7 @@ const matchMeetings = ((meetings, settings) => {
     //logic for all the black box magic happens here
 
     const freeMeetings = meetings.filter((meeting)=> {
-        if (meeting.attendees.length >= 0) {
+        if (meeting.attendees.length >= 0 && meeting.attendees <= 1) {
             return true
         }
         return false

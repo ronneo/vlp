@@ -6,11 +6,11 @@ const createActivity = ((settings) => {
     //dummy logic for demo
     if (settings.chatType === 'learn') {
         return [{
-            'question':'What is the other party name',
+            'question':'Find out your guide\'s name',
             'question_translated':'找出对方的名称',
             'avoid':['name', 'what', 'call']
         },{
-            'question':'What is the other party Job',
+            'question':'Learn more about his work',
             'question_translated':'找出对方的职业',
             'avoid':['occupation', 'job', 'what']
         },{

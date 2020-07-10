@@ -48,6 +48,15 @@ const VideoChat = (props:Props) => {
         top: '1em',
         right: '1em'
     }
+    const styleDebugMode = {
+        position:'absolute' as 'absolute',
+        top: '1em',
+        left: '1em',
+        fontSize:'1.5em',
+        background:'#000',
+        padding:'10px 20px',
+        zIndex: 99
+    }
 
     const [sessionEnd, setSessionEnd] = useState(false)
     const [startVideo, setStartVideo] = useState(false)
@@ -238,6 +247,7 @@ const VideoChat = (props:Props) => {
 
     return (<div className="videochatWrapper">
         <div className="videochat">
+            <div style={styleDebugMode}>Debug Mode On</div>
             <audio ref={audioRef}></audio>
             <div style={styleVideoCont}>
                 <video onPlay={initFaceRecongition} style={styleLocalVideo} ref={localVideoRef}></video>
