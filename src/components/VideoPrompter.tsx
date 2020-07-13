@@ -69,7 +69,9 @@ const VideoPrompter = (props:Props) => {
     const nextActivity = () => {
         if (activityCount < props.meetingActivity.length-1) {
             setActivityCount(activityCount+1)
-        } 
+        } else {
+            setActivityCount(0)
+        }
     }
     const keyPressActivity = (e:React.KeyboardEvent<HTMLButtonElement>) => {
         if (e.keyCode === 39) {
@@ -120,7 +122,7 @@ const VideoPrompter = (props:Props) => {
                 </div>
             </div></CSSTransition>)
         })}</div>
-        <div>{(activityCount < props.meetingActivity.length-1)?<Button outlined={true} onKeyDown={keyPressActivity} style={styleRefresh} minimal={true} icon="refresh" text="Next Suggestion" onClick={nextActivity} />:null}</div>
+        <div><Button outlined={true} onKeyDown={keyPressActivity} style={styleRefresh} minimal={true} icon="refresh" text="Next Suggestion" onClick={nextActivity} /></div>
     </div>)
 }
 
