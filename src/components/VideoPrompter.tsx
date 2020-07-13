@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';    
+import React, { useState, useEffect } from 'react';   
+import { CSSTransition } from 'react-transition-group' 
 import { Button } from "@blueprintjs/core";
 
 type Props = {
@@ -15,7 +16,8 @@ const VideoPrompter = (props:Props) => {
         borderRadius: 10,
         padding:'20px',
         background:'rgba(0,0,0,0.5)',
-        margin:'10px'
+        margin:'10px',
+        position: 'absolute' as 'absolute',
     }
     const styleMessageQuestion = {
     }
@@ -69,6 +71,15 @@ const VideoPrompter = (props:Props) => {
             setActivityCount(activityCount+1)
         } 
     }
+    const keyPressActivity = (e:React.KeyboardEvent<HTMLButtonElement>) => {
+        if (e.keyCode === 39) {
+            nextActivity()
+        }
+    }
+    const showMessage = (index:number) => {
+        if (index === activityCount) return true
+        return false
+    }
     useEffect(() => {
         let initialArr:Array<boolean> = Array.from(props.meetingActivity[activityCount].avoid, x=>false)
         console.log('new activity', initialArr, props.meetingActivity[activityCount])
@@ -76,7 +87,6 @@ const VideoPrompter = (props:Props) => {
     }, [activityCount, props.meetingActivity])
 
     useEffect(() => {
-        console.log('ending speech')
         if (props.ended) {
             speechAPI.stop()
         }
@@ -84,24 +94,33 @@ const VideoPrompter = (props:Props) => {
     }, [props.ended])
 
     startSpeechtoText()
-    const dialog = props.meetingActivity[activityCount]
 
     return (<div>
-        <div>{(activityCount < props.meetingActivity.length-1)?<Button style={styleRefresh} minimal={true} icon="refresh" text="Next Suggestion" onClick={nextActivity} />:null}</div>
-        <div style={styleMessageBox}>
-            <div style={styleMessageQuestion}>{dialog.question}</div>
-            <div style={styleMessageTranslate}>{dialog.question_translated}</div>
-            <div style={styleAnswer}>
-                <div style={styledescriptor}>Try to use these words:</div>
-                {dialog.avoid.map((word:string, index:number) => {
-                    let wstyle = {...styleAnswerToken}
-                    if (selectedWord[index]) {
-                        wstyle.background = '#990000'
-                    }
-                    return <span key={word} style={wstyle}>{word}</span>
-                })}
-            </div>
-        </div>
+        <div className="message-container">
+        {props.meetingActivity.map((dialog, index) => {
+            return (<CSSTransition
+                key={index}
+                in={showMessage(index)}
+                timeout={300}
+                classNames="message"
+                unmountOnExit
+              ><div style={styleMessageBox}>
+                <div style={styleMessageQuestion}>{dialog.question}</div>
+                <div style={styleMessageTranslate}>{dialog.question_translated}</div>
+                <div style={styleAnswer}>
+                    <div style={styledescriptor}>Try to use these words:</div>
+    
+                    {dialog.avoid.map((word:string, index:number) => {
+                        let wstyle = {...styleAnswerToken}
+                        if (selectedWord[index]) {
+                            wstyle.background = '#990000'
+                        }
+                        return <span key={word} style={wstyle}>{word}</span>
+                    })}
+                </div>
+            </div></CSSTransition>)
+        })}</div>
+        <div>{(activityCount < props.meetingActivity.length-1)?<Button outlined={true} onKeyDown={keyPressActivity} style={styleRefresh} minimal={true} icon="refresh" text="Next Suggestion" onClick={nextActivity} />:null}</div>
     </div>)
 }
 

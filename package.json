@@ -5,6 +5,7 @@
   "dependencies": {
     "@blueprintjs/core": "^3.28.1",
     "@blueprintjs/select": "^3.13.2",
+    "@types/react-transition-group": "^4.4.0",
     "amazon-chime-sdk-js": "^1.8.0",
     "aws-sdk": "^2.691.0",
     "body-parser": "^1.19.0",

@@ -121,7 +121,7 @@ const LaunchPad = () => {
 	const renderStage = () => {
 		switch(stage) {
 			case 0: return (<div className="setupchat">
-				<div style={styleHeader}><span style={styleLogo}>HAIL</span> is here to help you learn new languages<br /> and understand different culture</div>
+				<div style={styleHeader}><span style={styleLogo}>HAIL</span> is here to connect you with helpful guides to learn new languages and understand different cultures</div>
 				<ChatSetting updateAttribute={setUserAttributes} />
 				<Button icon="play" onClick={launchMeetingSetup} loading={loading} intent="primary" text="Set up new Chat" />
 				</div>)
