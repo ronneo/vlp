@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@blueprintjs/core": "^3.28.1",
+    "@blueprintjs/core": "^3.54.0",
     "@blueprintjs/select": "^3.13.2",
     "@types/react-transition-group": "^4.4.0",
     "amazon-chime-sdk-js": "^1.8.0",
